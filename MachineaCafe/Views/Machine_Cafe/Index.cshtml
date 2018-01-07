@@ -1,0 +1,26 @@
+﻿
+
+@model MachineaCafe.Models.MachineCafe
+
+
+@{
+    ViewBag.Title = "Machine Café";
+}
+
+<h2>Machine_Cafe</h2>
+
+@using (Html.BeginForm("Index", "Machine_Cafe", FormMethod.Post))
+{
+    @Html.Label("Choisissez une Boisson")
+    @Html.DropDownListFor(model => model.Boisson.id, Model.Boisson.ChoixList)
+    @Html.Label("Combien de morceaux de sucre?")
+    @Html.DropDownListFor(m => m.Qtesucre, new SelectList(ViewBag.QteSucre, "Value", "Text"))
+    @Html.Label("Souhaitez-vous utiliser votre propre mug?")
+    @Html.DropDownListFor(m => m.Mug, new SelectList(ViewBag.Mug, "Value", "Text"))
+    <br>
+    <input type="submit" value="Submit" />
+    
+        <span style="color:green">@ViewBag.commande</span> 
+    
+}
+
