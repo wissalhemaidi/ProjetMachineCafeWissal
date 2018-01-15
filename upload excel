@@ -1,0 +1,136 @@
+Controller:
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using ImportCsv.Models;
+
+namespace ImportCsv.Controllers
+{
+    public class importController : Controller
+    {
+        
+      
+        public ActionResult Index()
+        {
+            List<CustomerModel> customers = new List<CustomerModel>();
+            string filePath = "C:\\Users\\gh\\Desktop\\test.xlsx";
+
+        string  connString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + filePath + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=2\"";
+            OleDbConnection oledbConn = new OleDbConnection(connString);
+            DataTable dt = new DataTable();
+            try
+            {
+
+                oledbConn.Open();
+                using (OleDbCommand cmd = new OleDbCommand("SELECT * FROM [Sheet1$]", oledbConn))
+                {
+                    OleDbDataAdapter oleda = new OleDbDataAdapter();
+                    oleda.SelectCommand = cmd;
+                    DataSet ds = new DataSet();
+                    oleda.Fill(ds);
+
+                    dt = ds.Tables[0];
+                    ViewBag.Data = dt;
+                    //http://www.c-sharpcorner.com/UploadFile/dbb82e/read-data-from-excel-filexlsxlsxcsv-in-Asp-Net-mvc/
+                }
+            }
+            catch
+            {
+            }
+            finally
+            {
+
+                oledbConn.Close();
+            }
+            return View();
+        }
+    }
+}
+//***********************************************************************************
+View:
+@using System.Data;
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <table id="">
+
+        @if (ViewBag.Data != null)
+        {
+            <thead>
+
+                @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                {
+                <th>@column.ColumnName.ToUpper()</th>
+                }
+             </thead>
+                if ((ViewBag.Data as System.Data.DataTable).Rows.Count > 0)
+                {
+                   foreach (DataRow dr in (ViewBag.Data as System.Data.DataTable).Rows)
+                    {
+
+                        <tr>
+
+                            @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                            {
+                                <td data-title='@column.ColumnName'>
+
+                                    @dr[column].ToString()
+                                </td>
+                            }
+
+
+
+
+                        </tr>
+
+                    }
+
+                }
+                else
+                {
+                    int count = (ViewBag.Data as System.Data.DataTable).Columns.Count;
+                    <tr>
+
+                        <td colspan='@count' style="color:red;">
+
+                            No Data Found.
+                        </td>
+
+
+
+                    </tr>
+
+                }
+
+            }
+            else
+            {
+                if (ViewBag.Error != null)
+                {
+                    <tr>
+                        <td style="color:red;">
+
+                            @(ViewBag.Error != null ? ViewBag.Error.ToString() : "")
+                        </td>
+
+
+
+                    </tr>
+                }
+            }
+    </table>
+    
+</body>
+</html>
